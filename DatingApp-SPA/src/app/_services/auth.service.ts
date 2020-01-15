@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { environment } from '../../environments/environment';
 
 // Beacuse a service is not a component, the Injectable decorator must be added
 // When a service is added also need to be included in the providers array located at the app.module
@@ -9,7 +10,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
   providedIn: 'root'
 })
 export class AuthService {
-  baseUrl = 'http://localhost:5000/api/auth/';
+  baseUrl = environment.apiUrl + 'auth/';
   jwtHelper = new JwtHelperService();
   decodedToken: any;
 
