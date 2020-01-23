@@ -35,7 +35,7 @@ export class PhotoEditorComponent implements OnInit {
   initializeUploader() {
     this.uploader = new FileUploader({
       url: this.baseUrl + 'users/' + this.authService.decodedToken.nameid + '/photos',
-      authToken: 'Beaerer ' + localStorage.getItem('token'),
+      authToken: 'Bearer ' + localStorage.getItem('token'),
       isHTML5: true,
       allowedFileType: ['image'],
       removeAfterUpload: true,
@@ -44,7 +44,7 @@ export class PhotoEditorComponent implements OnInit {
     });
 
     // Tell that the file is not going with
-    this.uploader.onAfterAddingFile = (file) => { file.withCredentials = false; }
+    this.uploader.onAfterAddingFile = (file) => { file.withCredentials = false; };
 
     // To inmediately show the photo uploaded
     this.uploader.onSuccessItem = (item, response, status, headers) => {
@@ -68,9 +68,26 @@ export class PhotoEditorComponent implements OnInit {
       this.currentMain.isMain = false;
       photo.isMain = true;
       // Emit what we want to send out of our output property
-      this.getMemberPhotoChange.emit(photo.url);
+      // this.getMemberPhotoChange.emit(photo.url);
+      // To update the main photo in conjuction with all the components that use it
+      this.authService.changeMemberPhoto(photo.url);
+      // Update the user stored in local storage with the new photo url value
+      this.authService.currentUser.photoUrl = photo.url;
+      localStorage.setItem('user', JSON.stringify(this.authService.currentUser));
     }, error => {
       this.alertify.error(error);
+    });
+  }
+
+  deletePhoto(id: number) {
+    this.alertify.confirm('Are you sure you want to delete this photo?', () => {
+      this.userService.deletePhoto(this.authService.decodedToken.nameid, id).subscribe(() => {
+        // Remove the photo with the given id
+        this.photos.splice(this.photos.findIndex(p => p.id === id), 1);
+        this.alertify.success('Photo has been deleted');
+      }, error => {
+        this.alertify.error('Failed to delete the photo');
+      });
     });
   }
 }

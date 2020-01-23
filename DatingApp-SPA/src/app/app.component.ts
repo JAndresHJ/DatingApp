@@ -22,6 +22,9 @@ export class AppComponent implements OnInit {
     }
     if (user) {
       this.authService.currentUser = user;
+      // Any component that is subscribed to the current photoUrl in the auth service
+      // is also going to get this updated photo
+      this.authService.changeMemberPhoto(user.photoUrl);
     }
   }
 
